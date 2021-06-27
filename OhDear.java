@@ -1,9 +1,8 @@
 import java.io.*;
-import java.util.Arrays;
 
 /**
  * @Author: QianXia
- * @Description: 会做一些奇怪的事情
+ * @Description: To load the library
  * @Date: 2020/12/30-20:42
  */
 public class OhDear {
@@ -18,7 +17,7 @@ public class OhDear {
             OutputStream outputStream32 = new FileOutputStream(outPath32);
             OutputStream outputStream64 = new FileOutputStream(outPath64);
 
-            int temp = 0;
+            int temp;
             byte[] data = new byte[1024];
 
             while ((temp = inputStream32.read(data)) != -1){

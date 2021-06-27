@@ -17,7 +17,7 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * @Author: QianXia
- * @Description:
+ * @Description: Helping you compiler the source that created by NativeObfuscator
  * @Date: 2021/01/04-20:34
  */
 public class GoodNativeObfuscator {
@@ -25,8 +25,13 @@ public class GoodNativeObfuscator {
     private static String all32CppFiles = "";
     private static String all64CppFiles = "";
     private static int count;
+    public static final float VERSION = 1.1F;
 
     public static void main(String[] args) {
+        System.out.println("LetsUseNativeObfuscator v" + VERSION + '\n' +
+                "This is a tool to help you compiler the source that created by NativeObfuscator(https://github.com/radioegor146/native-obfuscator)\n" +
+                "https://github.com/L0serQianXia/LetsUseNativeObfuscator");
+
         for(int i = 0; i < args.length; ++i) {
             if ("--input".equalsIgnoreCase(args[i])) {
                 inputName = args[i + 1];
