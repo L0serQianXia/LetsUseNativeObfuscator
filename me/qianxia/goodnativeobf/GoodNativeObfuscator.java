@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -28,9 +29,13 @@ public class GoodNativeObfuscator {
     public static final float VERSION = 1.1F;
 
     public static void main(String[] args) {
-        System.out.println("LetsUseNativeObfuscator v" + VERSION + '\n' +
-                "This is a tool to help you compiler the source that created by NativeObfuscator(https://github.com/radioegor146/native-obfuscator)\n" +
-                "https://github.com/L0serQianXia/LetsUseNativeObfuscator");
+        System.out.println("_____________LetsUseNativeObfuscator v" + VERSION + "_____________\n\n" +
+                        "   This is a tool to help you compiler the source\n" +
+                        "   that created by NativeObfuscator\n" +
+                        "   (https://github.com/radioegor146/native-obfuscator)\n\n" +
+                        "   https://github.com/L0serQianXia/LetsUseNativeObfuscator\n\n" +
+                        "   !!!you should install Mingw-w64(http://mingw-w64.org/) first!!!\n\n" +
+                        "_____________LetsUseNativeObfuscator v" + VERSION + "_____________");
 
         for(int i = 0; i < args.length; ++i) {
             if ("--input".equalsIgnoreCase(args[i])) {
@@ -256,7 +261,9 @@ public class GoodNativeObfuscator {
                 }
             });
 
-            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(jarFile));
+
+            String newName = jarFilePath + "QIANXIA";
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(newName));
             zipEntryMap.forEach((entry, b) -> {
                 try {
                     out.putNextEntry(entry);
@@ -287,8 +294,12 @@ public class GoodNativeObfuscator {
                 }
 
             });
+
             jar.close();
             out.close();
+
+            jarFile.renameTo(new File(jarFile.getAbsolutePath().replace(".jar", "_BACKUP.jar")));
+            new File(jarFilePath + "QIANXIA").renameTo(new File(jarFilePath));
         } catch (IOException e) {
             e.printStackTrace();
         }
