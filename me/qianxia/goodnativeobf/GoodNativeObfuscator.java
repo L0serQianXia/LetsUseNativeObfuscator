@@ -118,13 +118,13 @@ public class GoodNativeObfuscator {
         System.out.println(all64CppFiles);
 
         try {
-            Process process = Runtime.getRuntime().exec("g++ -m64 -shared " + all64CppFiles + " -static-libstdc++ -static-libgcc -o x64/My64Shit.dll");
+            Process process = Runtime.getRuntime().exec("g++ -m64 -shared " + all64CppFiles + " -static-libstdc++ -static-libgcc -o x64/My64DLL.dll");
             process.waitFor();
         } catch (Exception var8) {
             var8.printStackTrace();
         }
         try {
-            Process process = Runtime.getRuntime().exec("g++ -m32 -shared " + all32CppFiles + " -static-libstdc++ -static-libgcc -o x32/My32Shit.dll");
+            Process process = Runtime.getRuntime().exec("g++ -m32 -shared " + all32CppFiles + " -static-libstdc++ -static-libgcc -o x32/My32DLL.dll");
             process.waitFor();
         } catch (Exception var8) {
             var8.printStackTrace();
@@ -136,8 +136,8 @@ public class GoodNativeObfuscator {
         File jarFile, dll32File, dll64File;
 
         String here = System.getProperty("user.dir");
-        dll32Path = here + "\\x32\\My32Shit.dll";
-        dll64Path = here + "\\x64\\My64Shit.dll";
+        dll32Path = here + "\\x32\\My32DLL.dll";
+        dll64Path = here + "\\x64\\My64DLL.dll";
 
         File dir = new File(here).getParentFile();
         File[] files = dir.listFiles();
@@ -208,8 +208,8 @@ public class GoodNativeObfuscator {
             InputStream input64Dll = new FileInputStream(dll64File);
 
             zipEntryMap.put(new ZipEntry("OhDear.class"), toByteArray(inputStream));
-            zipEntryMap.put(new ZipEntry("META-INF/SHIT"), toByteArray(input32Dll));
-            zipEntryMap.put(new ZipEntry("META-INF/SHIT64"), toByteArray(input64Dll));
+            zipEntryMap.put(new ZipEntry("META-INF/OhDear"), toByteArray(input32Dll));
+            zipEntryMap.put(new ZipEntry("META-INF/OhDear64"), toByteArray(input64Dll));
 
 
             AtomicBoolean found = new AtomicBoolean(false);

