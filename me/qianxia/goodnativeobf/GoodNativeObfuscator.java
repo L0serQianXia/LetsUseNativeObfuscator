@@ -17,10 +17,8 @@ public class GoodNativeObfuscator {
     private static String all64CppFiles = "";
     private static int count;
     private static final String PROGRAM_UPDATE_MESSAGE = "---NativeObfuscator编译助手---\n" +
-            "2021年1月5日更新\n" +
-            "1.支持编译Windows32位和Windows64位的Dll\n" +
-            "2.添加等待，不会出现一堆脑瘫线程卡爆CPU的问题\n" +
-            "3.不需要添加什么脑瘫参数\n" +
+            "2021年6月27日更新\n" +
+            "1.修复含空格的目录无法编译的漏洞\n" +
             "---NativeObfuscator编译助手---\n";
 
     public static void main(String[] args) {
@@ -51,7 +49,7 @@ public class GoodNativeObfuscator {
             }
 
             try {
-                Process process = Runtime.getRuntime().exec("g++ -m32 -c " + file.getName() + " -o x32/" + file.getName().replace(".cpp", ".o"));
+                Process process = Runtime.getRuntime().exec("g++ -m32 -c \"" + file.getName() + "\" -o x32/" + file.getName().replace(".cpp", ".o"));
                 process.waitFor();
                 all32CppFiles = all32CppFiles + "x32/" + file.getName().replace(".cpp", ".o ");
             } catch (Exception var10) {
@@ -65,7 +63,7 @@ public class GoodNativeObfuscator {
             }
 
             try {
-                Process process = Runtime.getRuntime().exec("g++ -m64 -c " + file.getName() + " -o x64/" + file.getName().replace(".cpp", ".o"));
+                Process process = Runtime.getRuntime().exec("g++ -m64 -c \"" + file.getName() + "\" -o x64/" + file.getName().replace(".cpp", ".o"));
                 process.waitFor();
                 all64CppFiles = all64CppFiles + "x64/" + file.getName().replace(".cpp", ".o ");
             } catch (Exception var10) {
@@ -82,7 +80,7 @@ public class GoodNativeObfuscator {
                     System.out.println(inputName + "\\output\\" + file.getName());
                     System.out.println("x32/" + file.getName().replace(".cpp", ".o"));
 
-                    Process process = Runtime.getRuntime().exec("g++ -m32 -c " + inputName + "\\output\\" + file.getName() + " -o x32/" + file.getName().replace(".cpp", ".o"));
+                    Process process = Runtime.getRuntime().exec("g++ -m32 -c \"" + inputName + "\\output\\" + file.getName() + "\" -o x32/" + file.getName().replace(".cpp", ".o"));
                     process.waitFor();
                     System.out.println(++count);
                     all32CppFiles = all32CppFiles + "x32/" + file.getName().replace(".cpp", ".o ");
@@ -95,7 +93,7 @@ public class GoodNativeObfuscator {
         for (File file : files) {
             if (file.getName().endsWith(".cpp") && !all64CppFiles.contains(file.getName())) {
                 try {
-                    Process process = Runtime.getRuntime().exec("g++ -m64 -c " + inputName + "\\output\\" + file.getName() + " -o x64/" + file.getName().replace(".cpp", ".o"));
+                    Process process = Runtime.getRuntime().exec("g++ -m64 -c \"" + inputName + "\\output\\" + file.getName() + "\" -o x64/" + file.getName().replace(".cpp", ".o"));
                     process.waitFor();
                     System.out.println(++count);
                     all64CppFiles = all64CppFiles + "x64/" + file.getName().replace(".cpp", ".o ");
