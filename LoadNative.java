@@ -1,5 +1,7 @@
 import java.io.*;
 
+import me.qianxia.DllDependent;
+
 /**
  * @Author: QianXia
  * @Description: To load the library
@@ -42,7 +44,21 @@ public class LoadNative {
             try {
                 System.load(outPath32);
             } catch (UnsatisfiedLinkError e) {
-                System.load(outPath64);
+                try {
+					System.load(outPath64);
+				} catch (UnsatisfiedLinkError e1) {
+					if(e1.getMessage().contains("Can't find")) {
+						String result = DllDependent.findDependents(outPath64, true);
+						System.err.println("==================Fatal Error==================");
+						System.err.println("We did'nt find DLL(s):" + result);
+						System.err.println("You should put them into \"C:\\Windows\\System32\"");
+						System.err.println("And restart the process");
+						System.err.println("==================Fatal Error==================");
+						System.exit(-1);
+					}
+
+					e1.printStackTrace();
+				}
             }
         } catch (Exception e) {
             e.printStackTrace();

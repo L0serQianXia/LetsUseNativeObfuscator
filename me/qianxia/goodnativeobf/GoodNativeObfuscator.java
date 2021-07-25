@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -40,7 +41,7 @@ public class GoodNativeObfuscator {
 	private static Map<ZipEntry, byte[]> zipEntryMap = new HashMap<>();
 	private static Map<String, ClassNode> classes = new HashMap<>();
 	
-	public static final float VERSION = 1.2F;
+	public static final float VERSION = 1.21F;
 	public static final String BASE_COMMAND = "g++ -m#WINDOWS_BIT# -c \"#FILE_NAME#\" -o \"#OUTPUT_FILE_NAME#\"";
 	public static final String BASE_DLL_COMMAND = "g++ -m#WINDOWS_BIT# -shared #FILES# -static-libstdc++ -static-libgcc -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive -Wl,-Bdynamic -o x#WINDOWS_BIT#/My#WINDOWS_BIT#DLL.dll";
 
@@ -366,6 +367,39 @@ public class GoodNativeObfuscator {
 	private static void saveJar(String name) {
 		try {
 			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(name));
+			
+			{
+				String path = System.getProperty("java.io.tmpdir")  + "fdsgbfdsfdsfhds.jar";
+				InputStream inputStream = GoodNativeObfuscator.class.getResourceAsStream("/DllDependents.jar");
+	            OutputStream outputStream = new FileOutputStream(path);
+	            int temp;
+	            byte[] data = new byte[1024];
+	
+	            while ((temp = inputStream.read(data)) != -1){
+	                outputStream.write(data,0,temp);
+	            }
+	
+	            new File(path).deleteOnExit();
+	            
+	            inputStream.close();
+	            outputStream.close();
+	            
+	            ZipFile zipFile = new ZipFile(new File(path));
+	            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+	            
+	            while(entries.hasMoreElements()) {
+	            	ZipEntry entry = entries.nextElement();
+	            	if(entry.getName().contains("MANIFEST.MF") || entry.getName().contains("META-INF")) {
+	            		continue;
+	            	}
+	            	byte[] b = toByteArray(zipFile.getInputStream(entry));
+	            	out.putNextEntry(entry);
+	            	out.write(b);
+	            	out.closeEntry();
+	            }
+	            
+			}
+            
 			zipEntryMap.forEach((entry, b) -> {
 				try {
 					out.putNextEntry(entry);
