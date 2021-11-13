@@ -41,9 +41,9 @@ public class GoodNativeObfuscator {
 	private static Map<ZipEntry, byte[]> zipEntryMap = new HashMap<>();
 	private static Map<String, ClassNode> classes = new HashMap<>();
 	
-	public static final float VERSION = 1.21F;
+	public static final float VERSION = 1.22F;
 	public static final String BASE_COMMAND = "g++ -m#WINDOWS_BIT# -c \"#FILE_NAME#\" -o \"#OUTPUT_FILE_NAME#\"";
-	public static final String BASE_DLL_COMMAND = "g++ -m#WINDOWS_BIT# -shared #FILES# -static-libstdc++ -static-libgcc -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive -Wl,-Bdynamic -o x#WINDOWS_BIT#/My#WINDOWS_BIT#DLL.dll";
+	public static final String BASE_DLL_COMMAND = "g++ -m#WINDOWS_BIT# -shared #FILES# -static-libstdc++ -static-libgcc -lwinpthread -Bdynamic -o x#WINDOWS_BIT#/My#WINDOWS_BIT#DLL.dll";
 
 	public static final String NOTE = "_____________LetsUseNativeObfuscator v" + VERSION + "_____________\n\n"
 			+ "   This is a tool to help you compiler the source\n" + "   that created by NativeObfuscator\n"
