@@ -41,7 +41,7 @@ public class GoodNativeObfuscator {
 	private static Map<ZipEntry, byte[]> zipEntryMap = new HashMap<>();
 	private static Map<String, ClassNode> classes = new HashMap<>();
 	
-	public static final float VERSION = 1.22F;
+	public static final float VERSION = 1.23F;
 	public static final String BASE_COMMAND = "g++ -m#WINDOWS_BIT# -c \"#FILE_NAME#\" -o \"#OUTPUT_FILE_NAME#\"";
 	public static final String BASE_DLL_COMMAND = "g++ -m#WINDOWS_BIT# -shared #FILES# -static-libstdc++ -static-libgcc -lwinpthread -Bdynamic -o x#WINDOWS_BIT#/My#WINDOWS_BIT#DLL.dll";
 
@@ -168,7 +168,7 @@ public class GoodNativeObfuscator {
 
 	public static void runCommand(String baseCommand, WindowsBit windowsBit, File file, String... str) {
 		try {
-			String filePath = file.getAbsolutePath();
+			String filePath = file.getCanonicalPath().replace(System.getProperty("user.dir"), ".");
 			String command = getCommand(baseCommand, windowsBit,
 					mergeArrays(new String[]{"#FILE_NAME#", filePath, "#OUTPUT_FILE_NAME#", filePath.replace(".cpp", ".o")}, str));
 
@@ -188,7 +188,7 @@ public class GoodNativeObfuscator {
 		File[] files = folder.listFiles((file, name) -> name.endsWith(".o"));
 		
 		StringBuilder names = new StringBuilder();
-		Arrays.asList(files).forEach(file -> names.append("\"").append(file.getPath()).append("\"").append(" "));
+		Arrays.asList(files).forEach(file -> names.append(file.getPath().replace(System.getProperty("user.dir"), ".")).append(" "));
 
 		return names.toString();
 	}
