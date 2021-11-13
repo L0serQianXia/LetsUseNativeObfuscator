@@ -329,7 +329,9 @@ public class GoodNativeObfuscator {
 					classes.put(cn.name, cn);
 					continue;
 				}
-				zipEntryMap.put(entry, toByteArray(jar.getInputStream(entry)));
+				if (!entry.isDirectory()) {
+					zipEntryMap.put(entry, toByteArray(jar.getInputStream(entry)));
+				}
 			}
 			
 			jar.close();
