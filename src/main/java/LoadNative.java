@@ -1,6 +1,9 @@
-import java.io.*;
-
 import me.qianxia.DllDependent;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @Author: QianXia
@@ -61,7 +64,7 @@ public class LoadNative {
     private static void printDependents(String dllPath) {
         String result = DllDependent.findDependents(dllPath, true);
         System.err.println("==================Fatal Error==================");
-        System.err.println("We did'nt find DLL(s):" + result);
+        System.err.println("We did not find DLL(s):" + result);
         System.err.println("You should put them into \"C:\\Windows\\System32\"");
         System.err.println("And restart the process");
         System.err.println("==================Fatal Error==================");

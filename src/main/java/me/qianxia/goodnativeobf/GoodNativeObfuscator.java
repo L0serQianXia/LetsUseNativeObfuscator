@@ -6,6 +6,8 @@ import org.objectweb.asm.tree.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -18,10 +20,11 @@ import java.util.zip.ZipOutputStream;
  */
 public class GoodNativeObfuscator {
 	private static int count;
+	private static final int threadCount = Math.max(1, Runtime.getRuntime().availableProcessors());
 	private static final Map<ZipEntry, byte[]> zipEntryMap = new HashMap<>();
 	private static final Map<String, ClassNode> classes = new HashMap<>();
 	
-	public static final float VERSION = 1.23F;
+	public static final float VERSION = 1.3F;
 	public static final String BASE_COMMAND = "g++ -m#WINDOWS_BIT# -c \"#FILE_NAME#\" -o \"#OUTPUT_FILE_NAME#\"";
 	public static final String BASE_DLL_COMMAND = "g++ -m#WINDOWS_BIT# -shared #FILES# -static-libstdc++ -static-libgcc -lwinpthread -Bdynamic -o x#WINDOWS_BIT#/My#WINDOWS_BIT#DLL.dll";
 
@@ -50,27 +53,54 @@ public class GoodNativeObfuscator {
 			System.err.print("[ERROR]We did not find the CPP file!");
 			System.exit(0);
 		}
-		
+
 		compile(WindowsBit.x32, files, dir);
 		compile(WindowsBit.x64, files, dir);
 	}
 	
 	public static void compile(WindowsBit windowsBit, File[] files, File dir) {
+		System.out.println("[INFO]Compile " + windowsBit.name() + " files with " + threadCount + " threads");
 		new File(dir, windowsBit.name()).mkdir();
-		
 
-		Arrays.asList(files).forEach((file) -> runCommand(BASE_COMMAND, windowsBit, file, 
-				file.getName().replace(".cpp", ".o"), "x#WINDOWS_BIT#/" + file.getName().replace(".cpp", ".o")));
-		
-		
-		dir = new File(dir, "\\output\\");
-		files = dir.listFiles((file, name) -> name.endsWith(".cpp"));
+		// multi-threading codes skid from Superblaubeere obfuscator(https://github.com/superblaubeere27/obfuscator) transforming classes...
+		final LinkedList<File> fileQueue = new LinkedList<>(Arrays.asList(files));
+		fileQueue.addAll(Arrays.asList(new File(dir, "\\output\\").listFiles((file, name) -> name.endsWith(".cpp"))));
+		List<Thread> threads = new ArrayList<>();
+		try {
+			for (int i = 0; i < threadCount; i++) {
+				Thread thread = new Thread(() -> {
+					while (true) {
+						File file;
+						synchronized (fileQueue) {
+							file = fileQueue.poll();
+						}
+						if (file == null) {
+							break;
+						}
 
-		Arrays.asList(files).forEach((file) -> runCommand(BASE_COMMAND, windowsBit, file, 
-				file.getName().replace(".cpp", ".o"), "x#WINDOWS_BIT#/" + file.getName().replace(".cpp", ".o"), 
-				"output\\x", "x"));
+						runCommand(BASE_COMMAND, windowsBit, file, file.getName().replace(".cpp", ".o"), "x#WINDOWS_BIT#/" + file.getName().replace(".cpp", ".o"), "output\\x", "x");
+					}
+				});
+				thread.start();
 
-		String fileNames = Utils.getFileNames(windowsBit, dir.getParentFile());
+				synchronized (threads) {
+					threads.add(thread);
+				}
+			}
+			while (true) {
+				synchronized (threads) {
+					if (threads.isEmpty()) break;
+
+					threads.stream().filter(thread -> thread == null || !thread.isAlive()).collect(Collectors.toList()).forEach(threads::remove);
+				}
+
+				Thread.sleep(100);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		String fileNames = Utils.getFileNames(windowsBit, dir);
 		runCommand(BASE_DLL_COMMAND, windowsBit, dir, "#FILES#", fileNames);
 	}
 
