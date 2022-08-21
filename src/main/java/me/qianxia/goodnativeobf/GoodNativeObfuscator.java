@@ -6,7 +6,6 @@ import org.objectweb.asm.tree.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -50,7 +49,8 @@ public class GoodNativeObfuscator {
 		File dir = new File(inputName);
 		File[] files = dir.listFiles((file, name) -> name.endsWith(".cpp"));
 		if(files == null || files.length == 0) {
-			System.err.print("[ERROR]We did not find the CPP file!");
+			System.err.print("[ERROR]CPP file not found!");
+			System.err.print("[ERROR]Please put \"LetsUseNativeObfucsator.jar\" under \"cpp\" directory!");
 			System.exit(0);
 		}
 
@@ -64,7 +64,13 @@ public class GoodNativeObfuscator {
 
 		// multi-threading codes skid from Superblaubeere obfuscator(https://github.com/superblaubeere27/obfuscator) transforming classes...
 		final LinkedList<File> fileQueue = new LinkedList<>(Arrays.asList(files));
-		fileQueue.addAll(Arrays.asList(new File(dir, "\\output\\").listFiles((file, name) -> name.endsWith(".cpp"))));
+		File[] outputCppFiles = new File(dir, "\\output\\").listFiles((file, name) -> name.endsWith(".cpp"));
+		if(outputCppFiles == null || outputCppFiles.length == 0) {
+			System.err.print("[ERROR]output CPP file not found!");
+			System.err.print("[ERROR]Please put \"LetsUseNativeObfucsator.jar\" under \"cpp\" directory!");
+			System.exit(0);
+		}
+		fileQueue.addAll(Arrays.asList(outputCppFiles));
 		List<Thread> threads = new ArrayList<>();
 		try {
 			for (int i = 0; i < threadCount; i++) {
@@ -135,6 +141,10 @@ public class GoodNativeObfuscator {
 		File dir = new File(inputName).getParentFile();
 		
 		File[] files = dir.listFiles((file, name) -> name.endsWith(".jar"));
+		if(files == null || files.length == 0) {
+			System.err.print("[ERROR]Jar file not found!");
+			System.exit(0);
+		}
 		for(File file : files) {
 			jarFilePath = file.getAbsolutePath();
 		}
@@ -143,7 +153,7 @@ public class GoodNativeObfuscator {
 		dllFile = new File(dllPath);
 
 		if (!jarFile.exists() || !dllFile.exists()) {
-			System.err.println("Jar File or DLL File not Found!!!");
+			System.err.println("[ERROR]Jar file or DLL file not found!!!");
 			return;
 		}
 		
