@@ -19,6 +19,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class GoodNativeObfuscator {
 	private static int count;
+	private static final String[] headerFiles = new String[]{"jni.h", "jni_md.h", "jvmti.h"};
 	private static final int threadCount = Math.max(1, Runtime.getRuntime().availableProcessors());
 	private static final Map<ZipEntry, byte[]> zipEntryMap = new HashMap<>();
 	private static final Map<String, ClassNode> classes = new HashMap<>();
@@ -38,11 +39,27 @@ public class GoodNativeObfuscator {
 		System.out.println(NOTE);
 
 		String inputName = System.getProperty("user.dir");
+		checkHeaderFiles(inputName);
 		System.out.println("[INFO]Compiling the CPP files");
 		compileCpp(inputName);
 		System.out.println("[INFO]Packing the JAR with DLL");
 		packJar(inputName);
 		System.out.println("[INFO]Finished.");
+	}
+
+	private static void checkHeaderFiles(String dir) {
+		System.out.println("[INFO]Checking Header files...");
+		for (String headerFile : headerFiles) {
+			try {
+				File file = new File(dir, headerFile);
+				if (!file.exists()) {
+					Utils.copyFileStream(GoodNativeObfuscator.class.getResourceAsStream("/headers/" + headerFile), new FileOutputStream(file));
+				}
+			} catch (IOException e) {
+				System.err.println("[ERROR]Ran into trouble when checking \"" + headerFile + "\" Header file!");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static void compileCpp(String inputName) {

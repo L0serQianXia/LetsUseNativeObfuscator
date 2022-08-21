@@ -34,6 +34,7 @@ public class Utils {
         while ((temp = in.read(buffer)) != -1) {
             out.write(buffer, 0, temp);
         }
+        out.close();
     }
 
     public static String[] mergeArrays(String[] array1, String[] array2) {
