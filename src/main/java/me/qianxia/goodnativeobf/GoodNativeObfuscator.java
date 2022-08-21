@@ -24,12 +24,13 @@ public class GoodNativeObfuscator {
 	private static final Map<ZipEntry, byte[]> zipEntryMap = new HashMap<>();
 	private static final Map<String, ClassNode> classes = new HashMap<>();
 	
-	public static final float VERSION = 1.3F;
+	public static final float VERSION = 1.4F;
 	public static final String BASE_COMMAND = "g++ -m#WINDOWS_BIT# -c \"#FILE_NAME#\" -o \"#OUTPUT_FILE_NAME#\"";
 	public static final String BASE_DLL_COMMAND = "g++ -m#WINDOWS_BIT# -shared #FILES# -static-libstdc++ -static-libgcc -lwinpthread -Bdynamic -o x#WINDOWS_BIT#/My#WINDOWS_BIT#DLL.dll";
 
 	public static final String NOTE = "_____________LetsUseNativeObfuscator v" + VERSION + "_____________\n\n"
-			+ "   This is a tool to help you compiler the source\n" + "   that created by NativeObfuscator\n"
+			+ "   It is a tool that help you compile the source\n" + "   that created by NativeObfuscator\n"
+			+ "   Tested on NativeObfuscator v1.7b & 3.3.3r"
 			+ "   (https://github.com/radioegor146/native-obfuscator)\n\n"
 			+ "   https://github.com/L0serQianXia/LetsUseNativeObfuscator\n\n"
 			+ "   !!!you should install Mingw-w64(http://mingw-w64.org/) first!!!\n\n"

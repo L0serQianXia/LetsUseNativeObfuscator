@@ -11,8 +11,13 @@ import java.io.OutputStream;
  * @Date: 2020/12/30-20:42
  */
 public class LoadNative {
+    private static boolean loaded;
+
     public static void OMG(){
         try {
+            if (loaded) {
+                return;
+            }
             String outPath32 = System.getProperty("java.io.tmpdir") + System.currentTimeMillis() + "x32.dll";
             String outPath64 = System.getProperty("java.io.tmpdir") + System.currentTimeMillis() + "x64.dll";
 
@@ -56,6 +61,7 @@ public class LoadNative {
 					e1.printStackTrace();
 				}
             }
+            loaded = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
