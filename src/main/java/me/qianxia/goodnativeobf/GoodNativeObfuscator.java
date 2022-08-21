@@ -151,12 +151,10 @@ public class GoodNativeObfuscator {
 	private static void packJar(WindowsBit windowsBit, String inputName) {
 		String dllPath, jarFilePath = null;
 		File jarFile, dllFile;
-
 		String unformatted = inputName + "\\x#WINDOWS_BIT#\\My#WINDOWS_BIT#DLL.dll";
 		dllPath = unformatted.replaceAll("#WINDOWS_BIT#", windowsBit.name().replace("x", ""));
 
 		File dir = new File(inputName).getParentFile();
-		
 		File[] files = dir.listFiles((file, name) -> name.endsWith(".jar"));
 		if(files == null || files.length == 0) {
 			System.err.print("[ERROR]Jar file not found!");
@@ -168,7 +166,6 @@ public class GoodNativeObfuscator {
 		
 		jarFile = new File(jarFilePath);
 		dllFile = new File(dllPath);
-
 		if (!jarFile.exists() || !dllFile.exists()) {
 			System.err.println("[ERROR]Jar file or DLL file not found!!!");
 			return;
@@ -186,31 +183,32 @@ public class GoodNativeObfuscator {
 			InputStream inputStream = GoodNativeObfuscator.class.getResourceAsStream("/LoadNative.class");
 			InputStream inputDll = new FileInputStream(dllFile);
 
-			// Add Native loader and DLL file
+			// Add Native loader and DLL files
 			zipEntryMap.put(new ZipEntry("LoadNative.class"), Utils.toByteArray(inputStream));
 			zipEntryMap.put(new ZipEntry("native0/" + (windowsBit.name().equals("x32") ? "x86" : "x64") + "-windows.dll"), Utils.toByteArray(inputDll));
 
-			boolean hasSTATIC = false;
-			// Add loadLibrary() to Main Class
+			// Add loadLibrary()
 			for(ClassNode node : classes.values()){
-				if(!mainClazz.equals(node.name)) {
-					return;
-				}
-				for(MethodNode method : node.methods) {
-					if("<clinit>".equals(method.name)) {
-						hasSTATIC = true;
+				// 直接在Loader的静态块里插入LoadLibrary (兼容Native混淆老版本 tested on 1.7)
+				if ("native0/Loader".equals(node.name)) {
+					MethodNode clinit = node.methods.stream().filter(method -> "<clinit>".equals(method.name)).findFirst().orElse(null);
+					if (clinit == null) {
+						clinit = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+						clinit.instructions.add(new InsnNode(Opcodes.RETURN));
+						node.methods.add(clinit);
 					}
+					addLoadLibrary(clinit);
+					continue;
 				}
-				
 				for(MethodNode method : node.methods) {
-					// 非Minecraft的Jar文件无需处理
-					if("main".equals(method.name) && "native0/Bootstrap".equals(mainClazz)) {
+					// 老版本存在的Bootstrap的loadLibrary需要被处理
+					if ("main".equals(method.name)) {
 						// 入口方法被混淆native
-						if(method.instructions.size() == 0) {
-							return;
+						if (method.instructions.size() == 0) {
+							break;
 						}
-						for(AbstractInsnNode insnNode : method.instructions.toArray()) {
-							if(!(insnNode instanceof MethodInsnNode)) {
+						for (AbstractInsnNode insnNode : method.instructions.toArray()) {
+							if (!(insnNode instanceof MethodInsnNode)) {
 								continue;
 							}
 							MethodInsnNode methodInsnNode = (MethodInsnNode) insnNode;
@@ -219,18 +217,11 @@ public class GoodNativeObfuscator {
 									&& "java/lang/System".equals(methodInsnNode.owner)
 									&& methodInsnNode.getPrevious().getOpcode() == Opcodes.LDC
 									&& ((String) ((LdcInsnNode) methodInsnNode.getPrevious()).cst).contains("native_jvm_classes");
-							if(flag) {
+							if (flag) {
 								method.instructions.remove(methodInsnNode.getPrevious());
 								method.instructions.remove(methodInsnNode);
-								if(!hasSTATIC) {
-									addLoadLibrary(method);
-								}
 							}
 						}
-					}
-					
-					if("<clinit>".equals(method.name)) {
-						addLoadLibrary(method);
 					}
 				}
 			}

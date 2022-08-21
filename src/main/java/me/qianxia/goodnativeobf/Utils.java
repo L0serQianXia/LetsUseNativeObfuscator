@@ -94,7 +94,10 @@ public class Utils {
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
 
-                if (mainClazz.equals(entry.getName().replaceAll(".class", ""))) {
+                // 如果没有主类，则加载native混淆器生成的Loader，将loadLibrary插入Loader的静态块中
+                if (entry.getName().equals("native0/Loader.class")
+                        || entry.getName().equals("native0/Bootstrap.class")
+                        || (mainClazz != null && mainClazz.equals(entry.getName().replaceAll(".class", "")))) {
                     ClassReader cr = new ClassReader(jar.getInputStream(entry));
                     ClassNode cn = new ClassNode();
                     cr.accept(cn, ClassReader.SKIP_FRAMES);
