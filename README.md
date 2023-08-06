@@ -1,3 +1,4 @@
+# This stupid shit is not supposed to exist, CMake is recommended.
 # LetsUseNativeObfuscator
 It is a tool that helps you compile the source that created by NativeObfuscator(https://github.com/radioegor146/native-obfuscator)  
 Now tested on NativeObfuscator v1.7b & 3.3.3r  
